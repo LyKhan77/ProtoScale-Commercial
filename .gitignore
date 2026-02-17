@@ -1,0 +1,27 @@
+conductor/
+GEMINI.md
+.gemini-clipboard/
+.DS_Store
+inspect_models.md
+FIXES.md
+
+# Refactor documentation (temporary files)
+refactor-*.md
+REFACTOR_COMPLETE.md
+
+# Environment variables (never commit!)
+.env
+.env.local
+.env.production
+.env.*.local
+**/.env
+**/.env.production
+
+# API Keys
+meshy-apikey.txt
+
+# Legacy code
+hanyuan3D-LegacyCode/
+
+# Vercel
+.vercel

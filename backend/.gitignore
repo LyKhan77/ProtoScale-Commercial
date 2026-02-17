@@ -1,0 +1,89 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Local environment variables
+.env
+.env.local
+.env.*.local
+
+# Storage (user data - should not be committed)
+app/storage/uploads/
+app/storage/outputs/
+*.glb
+*.obj
+*.png
+*.jpg
+*.jpeg
+
+# Model cache
+.cache/
+models/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Documentation build
+docs/_build/
+
+# Backup files
+*.bak
+*.tmp
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Model checkpoints
+ckpt/
+
+# Pip artifact files
+=*
+
+# Symlinks to external Hunyuan3D installation
+hy3dpaint
+hy3dshape
