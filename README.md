@@ -2,10 +2,11 @@
 
 <div align="center">
 
-![ProtoScale-AI](https://img.shields.io/badge/ProtoScale-AI-v2.1--refactor-teal)
+![ProtoScale-AI](https://img.shields.io/badge/ProtoScale-AI-v2.2--meshy-teal)
 ![Vue](https://img.shields.io/badge/Vue-3.5.24-42b883)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.110.0+-009688)
 ![Python](https://img.shields.io/badge/Python-3.10+-blue)
+![Meshy AI](https://img.shields.io/badge/Powered_by-Meshy_AI-purple)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 **Engineering-Grade Image-to-3D Conversion Platform for Manufacturing**
@@ -16,23 +17,23 @@
 
 ---
 
-## Tujuan App
+## App Goal
 
-**ProtoScale-AI** adalah platform *Image-to-3D* berbasis AI yang dirancang untuk mengubah gambar 2D (foto, sketsa, atau AI-generated images) menjadi model 3D siap manufaktur. Aplikasi ini menggunakan teknologi **Hunyuan3D-2.1** (PBR) dari Tencent untuk menghasilkan geometri 3D berkualitas tinggi dengan support *Physically Based Rendering* yang dapat dikalibrasi dimensi nyatanya dan diekspor untuk **FDM 3D Printing**.
+**ProtoScale-AI** is an AI-powered *Image-to-3D* platform designed to transform 2D images (photos, sketches, or AI-generated art) into manufacturing-ready 3D models. The application now integrates **Meshy AI** technology to generate high-quality 3D geometry with *Physically Based Rendering* (PBR) support, which can be calibrated for real-world dimensions and exported for **FDM 3D Printing**.
 
 ### Use Cases
-- **Prototyping Cepat**: Ubah foto produk menjadi model 3D dalam hitungan menit
-- **Reverse Engineering**: Dokumentasikan objek fisik menjadi model digital
-- **Manufacturing**: Generate geometri produksi dari gambar teknik atau sketsa
-- **Content Creation**: Buat aset 3D dari konsep 2D untuk gaming/VR/AR
+- **Rapid Prototyping**: Turn product photos into 3D models in minutes.
+- **Reverse Engineering**: Document physical objects into digital models.
+- **Manufacturing**: Generate production geometry from technical drawings or sketches.
+- **Content Creation**: Create 3D assets from 2D concepts for gaming/VR/AR.
 
-### Key Differentiator
-Berbeda dari tools AI art biasa, ProtoScale-AI fokus pada:
-- **Engineering Workflow**: Pipeline terstruktur dari Upload → Generate → Calibrate → Export
-- **Dimensional Accuracy**: Kalibrasi skala X/Y/Z dalam satuan milimeter (mm)
-- **Dual-GPU Pipeline**: Arsitektur parallel processing untuk performa maksimal
-- **Manufacturing-Ready**: Export STL yang kompatibel dengan slicer (Cura, PrusaSlicer, Bambu Studio)
-- **Local Processing**: Semua proses dilakukan lokal di GPU Anda, privasi terjaga
+### Key Differentiators
+Unlike standard AI art tools, ProtoScale-AI focuses on:
+- **Engineering Workflow**: Structured pipeline: Upload → Generate (Meshy AI) → Calibrate → Export.
+- **Dimensional Accuracy**: X/Y/Z scale calibration in millimeters (mm).
+- **Hybrid Pipeline**: Local background removal combined with cloud-based generation for optimal efficiency.
+- **Manufacturing-Ready**: STL export compatible with major slicers (Cura, PrusaSlicer, Bambu Studio).
+- **Secure Workflow**: Streamlined process designed for serious makers and engineers.
 
 ---
 
@@ -41,22 +42,18 @@ Berbeda dari tools AI art biasa, ProtoScale-AI fokus pada:
 ### Prerequisites
 
 #### Hardware Requirements
-Platform ini dioptimalkan untuk setup **Dual-GPU** untuk memisahkan beban kerja geometri dan tekstur, namun dapat berjalan pada single GPU.
+While the core 3D generation is offloaded to the cloud (Meshy AI), the application still utilizes local hardware for pre-processing (Background Removal) and rendering.
 
-- **Recommended (Dual GPU - Reference Setup)**:
-  - **GPU 1 (Geometry)**: RTX 4090 (24GB VRAM) - Menangani Voxelization & Shape Generation
-  - **GPU 0 (Texture/Util)**: RTX 5080 (16GB VRAM) - Menangani Background Removal & Texture Synthesis
-- **Minimum (Single GPU)**:
-  - NVIDIA GPU dengan 12GB+ VRAM (Balanced Quality, No Texture)
-  - 16GB+ VRAM required untuk Texture Generation
-- **RAM**: 32GB+ recommended
-- **Storage**: 20GB+ free space (Model weights + Caches)
+- **Recommended**:
+  - NVIDIA GPU with 6GB+ VRAM (for efficient local Background Removal).
+  - **RAM**: 16GB+ recommended.
+  - **Storage**: 5GB+ free space (Model caches + Outputs).
 
 #### Software Requirements
-- **OS**: Linux (Ubuntu 22.04+) atau Windows 11 dengan WSL2
-- **Python**: 3.10 atau 3.11
-- **Node.js**: 18.x atau 20.x
-- **CUDA**: 12.x (cek dengan `nvidia-smi` dan `nvcc --version`)
+- **OS**: Linux (Ubuntu 22.04+) or Windows 10/11 (WSL2 recommended).
+- **Python**: 3.10+.
+- **Node.js**: 18.x or 20.x.
+- **Meshy AI API Key**: Required for 3D generation. Get one at [meshy.ai](https://meshy.ai/).
 
 ---
 
@@ -75,31 +72,15 @@ cd ProtoScale-AI
 cd backend
 
 # Create virtual environment
-python3.10 -m venv venv
+python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-# Install PyTorch (CUDA 12.8) - SESUAIKAN dengan CUDA version Anda
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
-
-# Install Hunyuan3D-2.1 (AI Model - PBR Version)
-cd /home/gspe-ai3
-git clone https://github.com/Tencent/Hunyuan3D-2.git Hunyuan3D-2.1
-cd Hunyuan3D-2.1
-
-# Verify structure (should have hy3dshape/ and hy3dpaint/)
-ls -la hy3dshape/ hy3dpaint/
-
-# Create symlink for checkpoint directory
-ln -s hy3dpaint/ckpt ckpt
-
-# Download RealESRGAN checkpoint if missing
-cd ckpt
-wget https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.1/RealESRGAN_x4plus.pth
-cd ..
-
-# Install backend dependencies
-cd /path/to/ProtoScale-AI/backend
+# Install dependencies
 pip install -r requirements.txt
+
+# Configure Environment Variables
+cp .env.example .env
+# Edit .env and set your MESHY_API_KEY
 ```
 
 #### 3. Frontend Setup
@@ -111,7 +92,7 @@ cd frontend
 npm install
 
 # Configure API endpoint
-# Edit .env file:
+# Edit .env file if running on a different port (Default: 8077)
 echo "VITE_API_URL=http://localhost:8077" > .env
 ```
 
@@ -123,12 +104,9 @@ echo "VITE_API_URL=http://localhost:8077" > .env
 
 ```bash
 cd backend
-source venv/bin/activate
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-# Set environment variables (Dual GPU Config)
-export GEOMETRY_DEVICE="cuda:1"  # RTX 4090
-export TEXTURE_DEVICE="cuda:0"   # RTX 5080
-export ENABLE_TEXTURE="true"
+# Ensure MESHY_API_KEY is set in your .env file
 
 # Start FastAPI server
 uvicorn app.main:app --host 0.0.0.0 --port 8077 --reload
@@ -147,91 +125,78 @@ npm run dev
 
 ## Key Features
 
-### 1. Hunyuan3D-2.1 (PBR) Exclusive
-Platform menggunakan **Hunyuan3D-2.1** secara eksklusif dengan fitur:
-- **Physically Based Rendering**: Material realistis dengan support Albedo, Normal, Metallic, dan Roughness maps
-- **Enhanced Lighting**: Multi-source lighting setup untuk optimal texture visualization dengan ambient light intensities hingga 5.0
-- **Enhanced Stability**: Triple-layer VRAM cleanup mencegah OOM errors
-- **Optimized Pipeline**: Simplified codebase tanpa version switching overhead
-
-**Legacy Note**: Jobs dari v2.0 akan ditandai sebagai "DEPRECATED" dan tidak dapat diproses ulang. Silakan upload ulang untuk regenerasi dengan v2.1.
+### 1. Meshy AI Integration
+The platform leverages the power of **Meshy AI** for state-of-the-art 3D generation:
+- **High-Fidelity Geometry**: Superior mesh topology suitable for printing.
+- **PBR Textures**: Generates Albedo, Normal, Roughness, and Metallic maps.
+- **Fast Inference**: Cloud-based processing ensures quick turnaround times without requiring enterprise-grade local hardware.
 
 ### 2. Quality Presets
-Pilih keseimbangan antara kecepatan dan kualitas:
+Choose the balance between speed and detail (mapped to Meshy capabilities):
 
-| Preset | Est. Time | Face Count | Features |
-|--------|-----------|------------|----------|
-| **Draft** | ~1 min | 5K | Low Poly, No Texture |
-| **Balanced** | ~3 min | 50K | Medium Poly, Mesh Repair |
-| **High** | ~4 min | Unlimited | Full Detail, Texture Enabled |
-| **Ultra** | ~4 min+ | Unlimited | Max Resolution, Higher Guidance |
+| Preset | Description | Features |
+|--------|-------------|----------|
+| **Balanced** | Standard Generation | Good topology, balanced detail, standard PBR. |
+| **High** | Enhanced Detail | Higher polygon count, refined textures. |
 
 ### 3. Advanced 3D Preview & Analysis
-- **Inspector Panel**: Kontrol penuh atas properti visual, grid, dan lighting dengan multi-tab interface.
-- **Retexture Controls**: Advanced texture generation dengan kontrol resolution (512-2048px), views (3/4/6), dan optional seed untuk hasil reproducible.
-- **Mesh Analysis**: Pengecekan otomatis untuk *Watertight* dan *Manifold* geometry (krusial untuk 3D printing).
-- **Transform Controls**: Scale (uniform/per-axis), rotate, dan visualisasi dimensi real-time dengan live bounding box calculation.
+- **Inspector Panel**: Full control over visual properties, grid, and lighting.
+- **Retexture Controls**: Re-generate textures using text prompts via Meshy's Text-to-Texture API.
+- **Mesh Analysis**: Automatic checks for *Watertight* and *Manifold* geometry (crucial for 3D printing).
+- **Transform Controls**: Scale (uniform/per-axis), rotate, and real-time dimension visualization.
 
 ### 4. STL Printer Simulation
-- **Machine Configuration**: Pilih dari preset printer (Bambu Lab P1S, Ender 3 V3, dll) atau konfigurasi custom.
-- **Build Platform Visualization**: Visualisasi real-time model di atas build platform dengan dimensi akurat.
-- **Orientation Analysis**: Automatic detection orientasi optimal berdasarkan support material dan wall thickness.
-- **Print Time Estimation**: Estimasi waktu cetak berdasarkan parameter mesin dan quality settings.
-- **Support Preview**: Visualisasi support structure sebelum slice.
+- **Machine Configuration**: Select from presets (Bambu Lab P1S, Ender 3 V3, etc.) or custom config.
+- **Build Platform Visualization**: Real-time visualization on the build plate with accurate dimensions.
+- **Orientation Analysis**: Automatic detection of optimal orientation.
+- **Print Time Estimation**: Estimate print duration based on machine parameters.
 
 ### 5. Dimensional Scaling
-- **Uniform & Per-Axis**: Scale model secara proporsional atau stretch sumbu tertentu.
-- **Unit System**: Konversi otomatis dari model unit ke Millimeter (mm).
-- **Export Ready**: Scaling diterapkan langsung pada geometry saat export.
-
-### 6. Multi-GPU Pipeline
-Backend menggunakan **GPUSlotManager** untuk mendistribusikan beban kerja secara cerdas:
-- **Pipeline**: `Upload` → `Rembg (GPU 0)` → `Geometry (GPU 1)` → `Texture (GPU 0)` → `Export`.
-- **Concurrency**: Memungkinkan pemrosesan texture pada satu job sementara job lain melakukan geometry generation.
+- **Uniform & Per-Axis**: Scale models proportionally or stretch specific axes.
+- **Unit System**: Automatic conversion to Millimeters (mm).
+- **Export Ready**: Scaling is applied directly to the geometry upon export.
 
 ---
 
-## Flow App
+## App Flow
 
-ProtoScale-AI menggunakan **5-step workflow** linear dengan simulasi printer terintegrasi:
+ProtoScale-AI uses a streamlined **5-step workflow**:
 
 ```
 STEP 0: UPLOAD & CONFIGURE
 ┌──────────────────────────────────────────────────────────────┐
 │  UI Controls:                                                 │
-│  - Quality Preset: Draft / Balanced / High / Ultra           │
-│  - Remove Background: Toggle (uses U2Net)                    │
-│  - Enhanced Detail: Advanced processing options              │
+│  - Quality Preset: Balanced / High                           │
+│  - Remove Background: Toggle (uses local U2Net)              │
+│  - AI Model: Meshy-6 (Default)                               │
 │                                                               │
 │  Backend Action:                                              │
 │  - Upload image → Assign Job ID                              │
-│  - GPU 0: Background removal task (if enabled)               │
-│  - Uses Hunyuan3D-2.1 (PBR) exclusively                      │
+│  - GPU 0: Local Background removal task (if enabled)         │
 └──────────────────────────────────────────────────────────────┘
                           ↓
-STEP 1: GENERATE (PIPELINE)
+STEP 1: GENERATE (CLOUD PIPELINE)
 ┌──────────────────────────────────────────────────────────────┐
-│  Progress Tracking:                                           │
-│  - Multiview Generation (4 orthogonal views)                 │
-│  - 3D Generation (Voxelization & Marching Cubes)             │
-│  - Texture Synthesis (Optional, High/Ultra only)             │
+│  Meshy AI Processing:                                         │
+│  - Image-to-3D Conversion                                    │
+│  - Geometry Refinement                                       │
+│  - PBR Texture Synthesis                                     │
 │                                                               │
 │  Backend Architecture:                                       │
-│  - GPUSlotManager mengalokasikan task ke GPU yang available  │
-│  - GPU 1 (Geometry): Menjalankan heavy diffusion model       │
-│  - GPU 0 (Texture): Menjalankan paint pipeline               │
+│  - Polling service monitors Meshy API status                 │
+│  - Auto-downloads GLB upon completion                        │
 └──────────────────────────────────────────────────────────────┘
                           ↓
 STEP 2: PREVIEW & CALIBRATE
 ┌──────────────────────────────────────────────────────────────┐
 │  Inspector Panel:                                             │
-│  - Transform: Set dimensi X/Y/Z dalam mm                     │
-│  - Analysis: Cek "Watertight" & "Manifold" status            │
+│  - Transform: Set X/Y/Z dimensions in mm                     │
+│  - Analysis: Check "Watertight" & "Manifold" status          │
 │  - View: Toggle Grid, Lighting adjustment                    │
 │                                                               │
 │  Interactive Viewer:                                         │
-│  - Orbit/Zoom/Pan dengan TresJS                              │
-│  - Visualisasi bounding box real-time                        │
+│  - Orbit/Zoom/Pan with TresJS                                │
+│  - Real-time bounding box visualization                      │
 └──────────────────────────────────────────────────────────────┘
                           ↓
 STEP 3: PRINT SIMULATION (Optional)
@@ -241,68 +206,22 @@ STEP 3: PRINT SIMULATION (Optional)
 │  - Custom machine configuration                              │
 │                                                               │
 │  Analysis & Visualization:                                    │
-│  - Build platform visualization dengan dimensi               │
+│  - Build platform visualization                              │
 │  - Support structure preview                                 │
-│  - Print time & material estimation                          │
-│  - Orientation optimization analysis                         │
 └──────────────────────────────────────────────────────────────┘
                           ↓
 STEP 4: EXPORT
 ┌──────────────────────────────────────────────────────────────┐
 │  Formats:                                                     │
 │  - STL (Binary): Ready for Slicer (Cura/Bambu)               │
-│  - OBJ: Source mesh untuk editing di Blender                 │
+│  - OBJ: Source mesh for Blender editing                      │
 │  - GLB: Web-ready asset                                      │
 │                                                               │
 │  Final Processing:                                            │
-│  - Apply user scaling ke raw geometry                        │
+│  - Apply user scaling to raw geometry                        │
 │  - Generate binary output                                    │
 └──────────────────────────────────────────────────────────────┘
 ```
-
----
-
-## System Architecture
-
-### Parallel GPU Architecture
-
-Sistem menggunakan arsitektur antrian berbasis slot (`GPUSlotManager`) untuk memaksimalkan throughput pada setup multi-GPU.
-
-```mermaid
-graph TD
-    User[User Upload] --> Queue[Task Queue]
-    
-    subgraph "GPU 0 (RTX 5080 - 16GB)"
-        Rembg[Background Removal]
-        Tex[Texture Generation]
-    end
-    
-    subgraph "GPU 1 (RTX 4090 - 24GB)"
-        Geo[Geometry Generation]
-    end
-    
-    Queue -->|Step 1| Rembg
-    Rembg -->|Step 2| Geo
-    Geo -->|Step 3| Tex
-    Tex -->|Final| Storage[Local Storage]
-```
-
-### Backend Components
-- **FastAPI**: REST API layer.
-- **Task Queue**: In-memory job management dengan threading.
-- **GPUSlotManager**: Resource allocator untuk GPU lock management.
-- **Hunyuan3D Wrapper**: Interface ke model Tencent Hunyuan3D-2.
-
-### Frontend Components
-- **Vue 3 + Vite**: Core framework dengan 5 main views:
-  - `UploadView`: Image upload dengan quality preset selection
-  - `ProgressView`: Real-time job status tracking
-  - `PreviewView`: 3D visualization dengan transform & retexture controls
-  - `SimulationView`: STL printer simulation & analysis
-  - `ExportView`: Multi-format export dengan scaling
-- **Pinia**: State management untuk Job lifecycle.
-- **TresJS**: 3D rendering engine (Vue wrapper untuk Three.js) dengan enhanced multi-source lighting.
-- **TailwindCSS**: Styling system dengan dark mode support.
 
 ---
 
@@ -310,80 +229,41 @@ graph TD
 
 ### Environment Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `GEOMETRY_DEVICE` | `cuda:1` | GPU ID untuk shape generation (Heavy VRAM) |
-| `TEXTURE_DEVICE` | `cuda:0` | GPU ID untuk texture & utilitas (Medium VRAM) |
-| `ENABLE_TEXTURE` | `true` | Enable/Disable texture generation step |
-| `MODEL_IDLE_TIMEOUT`| `480` | Detik sebelum model di-unload dari VRAM (8 min) |
-| `HUNYUAN_PATH` | `/home/gspe-ai3/Hunyuan3D-2.1` | Path local repo Hunyuan3D-2.1 (untuk import `hy3dshape`/`hy3dpaint`) |
-| `HUNYUAN_CKPT_DIR` | `{HUNYUAN_PATH}/ckpt` | Directory checkpoint (berisi `RealESRGAN_x4plus.pth`) |
-| `MODEL_PATH` | `tencent/Hunyuan3D-2.1/hunyuan3d-dit-v2-1` | HuggingFace model ID untuk geometry pipeline |
-| `REMBG_MODEL` | `u2net` | Model untuk background removal |
+| Variable | Description |
+|----------|-------------|
+| `MESHY_API_KEY` | **Required**. Your API Key from Meshy.ai |
+| `MESHY_API_URL` | Optional. Base URL for Meshy API (Default: https://api.meshy.ai/v1) |
+| `REMBG_MODEL` | Model for local background removal (Default: `u2net`) |
+| `GEOMETRY_DEVICE` | Local GPU ID for background removal (e.g., `cuda:0`) |
 
 ---
 
 ## Troubleshooting
 
-### 1. CUDA Out of Memory
-**Symptom**: Error saat geometry generation.
+### 1. Generation Failed
+**Symptom**: Job status turns to "Failed" after submission.
 **Fix**:
-- Pastikan `GEOMETRY_DEVICE` mengarah ke GPU dengan VRAM terbesar (24GB+ recommended untuk Ultra).
-- Turunkan Quality Preset ke "Balanced".
-- Cek apakah ada process lain menggunakan GPU (`nvidia-smi`).
-- Backend sudah dilengkapi **Triple-Layer VRAM Cleanup**:
-  - Pre-load cleanup (saat model load)
-  - Pre-stage cleanup (sebelum geometry/texture) ⭐ Otomatis
-  - Unload cleanup (saat idle timeout)
+- Check your `MESHY_API_KEY` in the `.env` file.
+- Verify you have sufficient credits on your Meshy account.
+- Check the backend logs for specific API error messages.
 
-### 2. Texture Generation / Retexture Issues
-**Symptom**: Model hasil High/Ultra tidak memiliki warna / texture stage sangat cepat / retexture gagal.
+### 2. Background Removal Issues
+**Symptom**: Poor cutout quality.
 **Fix**:
-- Cek `ENABLE_TEXTURE` di env vars (default: `true`).
-- Texture gen butuh ~11GB VRAM free pada `TEXTURE_DEVICE` (GPU 0).
-- **Retexture Controls** (di Preview panel):
-  - Gunakan slider Resolution (512-2048px) - higher = lebih detail tapi slower
-  - Adjust Views parameter (3/4/6) untuk coverage berbeda
-  - Optional Seed input untuk reproducible results
-- **Dependency Check**:
-  ```bash
-  pip install fast-simplification>=0.1.13 pytorch-lightning>=2.0.0
-  pip install "transformers<5.0.0"  # v5.0+ incompatible
-  ```
-- **Checkpoint Verification**:
-  ```bash
-  ls -lh $HUNYUAN_PATH/ckpt/RealESRGAN_x4plus.pth  # Should be ~67MB
-  ```
-- **Path Verification**:
-  ```bash
-  # Verify hy3dshape and hy3dpaint directories exist
-  ls $HUNYUAN_PATH/hy3dshape/ $HUNYUAN_PATH/hy3dpaint/
-  ```
+- Ensure the input image has high contrast between the subject and background.
+- "u2net" runs locally; ensure your local GPU/CPU is functioning correctly.
 
-### 3. Dark Texture Appearance
-**Symptom**: Model dengan texture terlihat terlalu gelap / kontras buruk di preview.
+### 3. Frontend Connection Refused
+**Symptom**: "Network Error" when uploading.
 **Fix**:
-- Lighting sudah dioptimalkan dengan multi-source setup:
-  - Ambient light intensity: 5.0 (global illumination)
-  - Hemisphere light + brighter ground reflection (0x888888)
-  - 4 directional lights dengan balanced intensity
-  - Background canvas lebih terang untuk kontras lebih baik
-- Jika masih terlalu gelap:
-  - Cek zoom level - try reset camera dengan tombol di inspector
-  - Grid background membantu visibility - toggle "Show Floor Grid" di inspector
-  - Material properties tergantung dari texture yang di-generate
-
-### 4. Frontend Connection Refused
-**Symptom**: "Network Error" saat upload.
-**Fix**:
-- Pastikan backend running (`uvicorn app.main:app`).
-- Cek `VITE_API_URL` di `frontend/.env` match dengan port backend (Default: 8077).
+- Ensure backend is running (`uvicorn app.main:app`).
+- Check `VITE_API_URL` in `frontend/.env` matches the backend port (Default: 8077).
 
 ---
 
 ## Credits
 
-- **Core AI**: [Tencent Hunyuan3D-2](https://github.com/Tencent/Hunyuan3D-2)
+- **Core AI**: [Meshy AI](https://meshy.ai/)
 - **Background Removal**: [rembg](https://github.com/danielgatis/rembg)
 - **3D Engine**: [Three.js](https://threejs.org/) & [TresJS](https://tresjs.org/)
 
@@ -391,6 +271,9 @@ graph TD
 
 <div align="center">
 
-**Built with ❤️ for the 3D Printing Community**
+**Bridging the gap between imagination and reality.**
+*Dedicated to empowering the global 3D Printing Community, one layer at a time.*
+
+Create by Lee Khan
 
 </div>
